@@ -1,0 +1,156 @@
+
+#Mlyasnikov seedbox
+
+secrets: secrets.yml #paswords and account info
+
+templates:
+  global:
+    transmission:
+	  path: /srv/share/downloads
+	
+	regexp:
+      reject:
+        - (s|d)ub(s|bed)?\b: {from: title}                    # Block any subbed/dubbed/etc videos
+        - \bspanish\b: {from: title}                          # Spanish releases kept cropping up
+        - \b(duo|tri|quadri|tetra|penta)logy\b: {from: title} # Block series, only accept one at a time
+        - \b3-?D\b: {from: title}                             # I don't have any 3D displays
+        - \btrailer\b: {from: title}                          # I've gotten a few trailers that matched as movies. VERY annoying
+        - \bR5\b: {from: title}                               # The following are poor quality types that somehow got through the quality
+        - \bWEBSCR\b: {from: title}                           # features usually due to the title including a keyword like "720p" as well
+        - \bscreener\b: {from: title}
+        - \bTS\b: {from: title}
+        - \bCam\b: {from: title}
+        - '{C_P}': {from: title}                              # The following are groups with poor quality releases
+        - TrTd TeaM: {from: title}
+        - \[TNTVillage\]: {from: title}
+        - \[facepalm\]: {from: title}
+        - \bASAP\b: {from: title}
+        - the.day.of.the.doctor                               # The following are titles that caused me issues from plugins
+    
+	# Require at least 10 seeds of any torrent
+    torrent_alive:
+      min_seeds: 10
+      reject_for: 1 day
+    
+	# Filter by filenames. Allow multiple video types and rar packs (but note if there is just a
+    # single .rar file it won't be accepted)
+    content_filter:
+      require:
+        - '*.avi'
+        - '*.mkv'
+        - '*.mpg'
+        - '*.mp4'
+        - '*.r0*'
+        - '*.part0*'
+      reject:
+        - 'password.txt'
+        - '*.wmv'
+   
+    # The Pirate Bay ssl certs always fail
+    verify_ssl_certificates: no
+    # Size and seed restrictions require real torrents
+    magnets: no
+    
+  
+  tv-global:
+    configure_series:
+	  from:
+	    trakr_list:
+		  username: {trakt.login}
+		  password: {trakt.pass}
+		  list: Follow
+		  type: shows
+	
+	thetvdb_lookup: yes
+	transmission:
+	  path: /srv/share/downloads/series
+	
+
+  
+tasks:
+
+  series.local:
+    template:
+      - tv-global
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+	  
+	find:
+      path: '/home/vfrc2/Dropbox/torrents/TV'
+      regexp: '.*\.torrent$'
+      recursive: yes
+    
+	no_entries_ok: yes
+	
+	plugin_priority:
+      exec: 0
+	  
+	exec:
+      on_output:
+        for_accepted: rm "{{location}}"
+	
+    accept_all: yes
+    
+  
+  series.lostfilm.tv:
+    rss: http://www.lostfilm.tv/rssdd.xml
+	
+	template:
+	  - tv-global
+  
+  series.nnm-club.me:
+    rss: http://nnm-lub.me/rssd.xml
+	
+    template:
+	  - tv-global 
+	  
+  over.local:
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+	  
+	find:
+      path: '/home/vfrc2/Dropbox/torrents/'
+      regexp: '.*\.torrent$'
+      recursive: yes
+    
+	no_entries_ok: yes
+	
+	plugin_priority:
+      exec: 0
+	  
+	exec:
+      on_output:
+        for_accepted: rm "{{location}}"
+	
+    accept_all: yes
+   
+  over.nnm-club.me:
+    rss: http://nnm-lub.me/rssd.xml
+    
+    
+   
+    
+
+    
+    
+    
+
+  
