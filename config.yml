@@ -55,7 +55,7 @@ templates:
   tv-global:
     configure_series:
       from:
-        trakr_list:
+        trakt_list:
           username: {{ secrets.trakt.login }}
           password: {{ secrets.trakt.pass }}
           list: Follow
