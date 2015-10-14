@@ -54,19 +54,18 @@ templates:
   
   tv-global:
     configure_series:
-	  from:
-	    trakr_list:
-		  username: {{ secrets.trakt.login }}
-		  password: {{ secrets.trakt.pass }}
-		  list: Follow
-		  type: shows
-	
-	thetvdb_lookup: yes
-	transmission:
-	  path: /srv/share/downloads/series
-	
+      from:
+        trakr_list:
+          username: {{ secrets.trakt.login }}
+          password: {{ secrets.trakt.pass }}
+          list: Follow
+          type: shows
 
-  
+    thetvdb_lookup: yes
+    transmission:
+      path: /srv/share/downloads/series
+
+
 tasks:
 
   series.local:
@@ -83,41 +82,33 @@ tasks:
       - regexp
       - content_size
       - torrent_alive
-	  
-	find:
+
+    find:
       path: '/home/vfrc2/Dropbox/torrents/TV'
       regexp: '.*\.torrent$'
       recursive: yes
     
-	no_entries_ok: yes
-	
-	plugin_priority:
+    no_entries_ok: yes
+    
+    plugin_priority:
       exec: 0
-	  
-	exec:
+    
+    exec:
       on_output:
         for_accepted: rm "{{location}}"
-	
-    accept_all: yes
     
-  
+    accept_all: yes
+
   series.lostfilm.tv:
     rss: http://www.lostfilm.tv/rssdd.xml
-	
-	template:
-	  - tv-global
+    template:
+      - tv-global
   
   series.nnm-club.me:
     rss: http://nnm-lub.me/rssd.xml #user selection
-	
+    
     template:
-	  - tv-global
-	
-  
-    
-    
-   
-    
+      - tv-global
 
     
     
