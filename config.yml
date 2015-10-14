@@ -56,8 +56,8 @@ templates:
     configure_series:
 	  from:
 	    trakr_list:
-		  username: {trakt.login}
-		  password: {trakt.pass}
+		  username: {{ secrets.trakt.login }}
+		  password: {{ secrets.trakt.pass }}
 		  list: Follow
 		  type: shows
 	
@@ -108,42 +108,12 @@ tasks:
 	  - tv-global
   
   series.nnm-club.me:
-    rss: http://nnm-lub.me/rssd.xml
+    rss: http://nnm-lub.me/rssd.xml #user selection
 	
     template:
-	  - tv-global 
-	  
-  over.local:
-    disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
-      - configure_series
-      - trakt_list
-      - inputs
-      - exists_series
-      - regexp
-      - content_size
-      - torrent_alive
-	  
-	find:
-      path: '/home/vfrc2/Dropbox/torrents/'
-      regexp: '.*\.torrent$'
-      recursive: yes
-    
-	no_entries_ok: yes
+	  - tv-global
 	
-	plugin_priority:
-      exec: 0
-	  
-	exec:
-      on_output:
-        for_accepted: rm "{{location}}"
-	
-    accept_all: yes
-   
-  over.nnm-club.me:
-    rss: http://nnm-lub.me/rssd.xml
+  
     
     
    
