@@ -69,6 +69,13 @@ templates:
       path: /srv/share/downloads/series/{{ series_name }}
 
     thetvdb_lookup: yes
+    
+    pushbullet:
+      apikey: '{{ secrets.pushbullet.apikey }}'
+      title: "[Flexget] {{task}}"
+      body: "{{ tvdb_series_name|default(series_name) }} - {{ series_id }}{% if tvdb_ep_name|default(False) %} - {{ tvdb_ep_name }}{% endif %}\n{{ quality }}"
+      url: "{% if trakt_series_url is defined and trakt_season is defined and trakt_episode is defined %}{{ trakt_series_url }}/season/{{ trakt_season }}/episode/{{ trakt_episode }}{% endif %}"
+    
   
   movies-global:
     verify_ssl_certificates: no 
@@ -82,11 +89,23 @@ templates:
     movie_queue: accept
     transmission:
       path: /srv/share/downloads/movies
+    
+    pushbullet:
+      apikey: '{{ secrets.pushbullet.apikey }}'
+      title: "[Flexget] {{task}}"
+      body: "{{ imdb_name }} ({{ imdb_year }})\n{{ quality }}"
+      url: "{% if imdb_url %}{{ imdb_url }}{% endif %}"
 
   over-global:
     verify_ssl_certificates: no
     transmission:
       path: /srv/share/downloads/
+      
+    pushbullet:
+      apikey: '{{ secrets.pushbullet.apikey }}'
+      title: "[Flexget] {{task}}"
+      body: "{{ title }}"
+      
 
 
 tasks:
