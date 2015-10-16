@@ -1,13 +1,16 @@
 
 #Mlyasnikov seedbox
 
+#Secrets
+# trakt.login
+# trakt.pass
 secrets: secrets.yml #paswords and account info
 
 templates:
   global:
-    transmission:
-      path: /srv/share/downloads
-    
+#    transmission:
+#      path: /srv/share/downloads
+#    metainfo_series: yes    
     regexp:
       reject:
         - (s|d)ub(s|bed)?\b: {from: title}                    # Block any subbed/dubbed/etc videos
@@ -40,8 +43,6 @@ templates:
         - '*.mkv'
         - '*.mpg'
         - '*.mp4'
-        - '*.r0*'
-        - '*.part0*'
       reject:
         - 'password.txt'
         - '*.wmv'
@@ -56,19 +57,56 @@ templates:
     configure_series:
       from:
         trakt_list:
-          username: {{ secrets.trakt.login }}
-          password: {{ secrets.trakt.pass }}
+          username: vfrc2
+          password: s4ed6w
           list: Follow
           type: shows
+      settings:
+        quality: <720p
+#    transmission:
+#      path: /srv/share/downloads/serie
 
     thetvdb_lookup: yes
-    transmission:
-      path: /srv/share/downloads/series
+  
+  movies-global:
+    verify_ssl_certificates: no  
+    movie_queue: accept
+#    transmission:
+#      path: /srv/share/downloads/movies
+
+  over-global:
+    verify_ssl_certificates: no
+#    transmission:
+#      path: /srv/share/downloads/movies
 
 
 tasks:
 
-  series.local:
+  #Conetent:
+  
+  # series
+  #   local 
+  #   nnm-club.me dl list
+  #   lostfilm.tv
+  #
+  # movies
+  #   local
+  #   nnm-club.me dl list
+  #   nnm-club.me global list
+  #   rutraker.org global list
+  #
+  # over
+  #   local
+  #   nnm-club.me dl list
+  #
+  # service tasks
+  # scheldure
+  
+  
+  #get torrent from local folder
+  #not check for series ep num or so, just download torrent 
+  local.series:
+    priority: 10
     template:
       - tv-global
     disable:
@@ -84,7 +122,7 @@ tasks:
       - torrent_alive
 
     find:
-      path: '/home/vfrc2/Dropbox/torrents/TV'
+      path: '/home/vfrc2/'
       regexp: '.*\.torrent$'
       recursive: yes
     
@@ -99,16 +137,188 @@ tasks:
     
     accept_all: yes
 
+  #from lostfilm.tv main series feed
   series.lostfilm.tv:
+    priority: 11
+    headers:
+      cookie: "uid=40954; pass=1d009bd205be8f7c1045111fdb319c48;"
     rss: http://www.lostfilm.tv/rssdd.xml
+
+    manipulate:
+      - title:
+          from: url
+      - title:
+          replace:
+            regexp: 'https://www\.lostfilm\.tv/download\.php.+&((.*)((s|S)\d\d(e|E)\d\d)(.*))\.torrent'
+            format: '\2 \3 \6'
+      - title:
+          replace:
+            regexp: '\.'
+            format: ' '
     template:
       - tv-global
   
+  #second series feed, emit only selected torrents, need just for grouping
   series.nnm-club.me:
-    rss: http://nnm-lub.me/rssd.xml #user selection
-    
+    priority: 10
+    rss: "http://nnm-club.me/forum/rss2.php?f=1219,768,769&r&dl=8802965&h=24"
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+   
+    accept_all: true
     template:
-      - tv-global
+      - tv-global    
+    
+  # local movie feed
+  local.movies:
+    priority: 20
+    template:
+      - movies-global
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+      - movie_queue
+
+    filesystem:
+      path: '/home/vfrc2/' #movie folder
+      regexp: '.*\.torrent$'
+      recursive: yes
+
+    no_entries_ok: yes
+
+    plugin_priority:
+      exec: 0
+
+    exec:
+      on_output:
+        for_accepted: rm "{{location}}"
+
+    accept_all: yes
+  
+  #Movies accept without filter, just for groouping
+  movies.nnm-club.me.dl:
+    priority: 20
+    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&dl=8802965&h=24"
+    template:
+      - movies-global
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+      - movie_queue
+    accept_all: yes
+    
+  #Movies from global feed filtred by movie_queue
+  movies.nnm-club.me:
+    priority: 21
+    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&h=24"
+    template:
+      - movies-global
+      
+      
+  local.over:
+    priority: 30
+    template:
+      - over-global
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+      - movie_queue
+
+    filesystem:
+      path: '/home/vfrc2/' #over folder
+      regexp: '.*\.torrent$'
+      recursive: yes
+
+    no_entries_ok: yes
+
+    plugin_priority:
+      exec: 0
+
+    exec:
+      on_output:
+        for_accepted: rm "{{location}}"
+
+    accept_all: yes
+
+  over.nnm-club.me.dl:
+    priority: 30
+    rss: "http://nnm-club.me/forum/rss2.php?dl=8802965&h=24"
+    template:
+      - over-global
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+      - movie_queue
+    accept_all: yes
+      
+#Service tasks
+
+  #service task for fillup moviequeue
+  queue.movies:
+    trakt_list:
+      username: vfrc2
+      password: s4ed6w
+      list: watchlist
+      type: movies
+    accept_all: yes
+    movie_queuw: add
+
+schedules:
+  - tasks: [queue.*]
+    interval:
+      hours: 5
+  - tasks: [movies.*, series.*, over.*]
+    interval:
+      minutes: 20
+  - tasks: [local.*]
+    interval:
+      minutes: 1
+
+    
+  
+  
+
 
     
     
