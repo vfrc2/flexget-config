@@ -239,9 +239,9 @@ tasks:
     
     manipulate:
       - title:
-        replace:
-          regexp: '(.*?/\s*(.*?)|(.*?))\s(\[+.*\])'
-          format: '\2 \4'
+          replace:
+            regexp: '(.*?/\s*(.*?)|(.*?))\s(\[+.*\])'
+            format: '\2 \4'
         
     template:
       - movies-global
