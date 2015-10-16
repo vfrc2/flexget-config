@@ -8,9 +8,10 @@ secrets: secrets.yml #paswords and account info
 
 templates:
   global:
-#    transmission:
-#      path: /srv/share/downloads
-#    metainfo_series: yes    
+    transmission:
+      host: server.f6.lan
+      path: /srv/share/downloads
+    
     regexp:
       reject:
         - (s|d)ub(s|bed)?\b: {from: title}                    # Block any subbed/dubbed/etc videos
@@ -63,8 +64,8 @@ templates:
           type: shows
       settings:
         quality: <720p
-#    transmission:
-#      path: /srv/share/downloads/serie
+    transmission:
+      path: /srv/share/downloads/series/{{ series_name }}
 
     thetvdb_lookup: yes
   
@@ -78,13 +79,13 @@ templates:
       strict: no
 
     movie_queue: accept
-#    transmission:
-#      path: /srv/share/downloads/movies
+    transmission:
+      path: /srv/share/downloads/movies
 
   over-global:
     verify_ssl_certificates: no
-#    transmission:
-#      path: /srv/share/downloads/movies
+    transmission:
+      path: /srv/share/downloads/
 
 
 tasks:
@@ -162,11 +163,17 @@ tasks:
           replace:
             regexp: '\.'
             format: ' '
+    
+    urlrewrite:
+      sitename:
+        regexp: 'http://lostfilm.tv/download.php\?(?P<details>.*)'
+        format: 'http://www.lostfilm.tv/download.php?\g<details>'
+    
     template:
       - tv-global
   
   #second series feed, emit only selected torrents, need just for grouping
-  series.nnm-club.me:
+  series.nnm-club.me.dl:
     priority: 10
     rss: "http://nnm-club.me/forum/rss2.php?f=1219,768,769&r&dl=8802965&h=24"
     disable:
@@ -180,7 +187,8 @@ tasks:
       - regexp
       - content_size
       - torrent_alive
-   
+      
+    no_entries_ok: yes
     accept_all: true
     template:
       - tv-global    
@@ -241,7 +249,8 @@ tasks:
       - movie_queue
       - quality
       - content_size
-      
+    
+    no_entries_ok: yes
     accept_all: yes
     
   #Movies from global feed filtred by movie_queue
