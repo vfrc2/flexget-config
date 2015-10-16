@@ -236,6 +236,13 @@ tasks:
   movies.nnm-club.me:
     priority: 21
     rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&h=24"
+    
+    manipulate:
+      - title:
+        replace:
+          regexp: '(.*?/\s*(.*?)|(.*?))\s(\[+.*\])'
+          format: '\2 \4'
+        
     template:
       - movies-global
       
@@ -302,12 +309,12 @@ tasks:
       list: watchlist
       type: movies
     accept_all: yes
-    movie_queuw: add
+    movie_queue: add
 
 schedules:
   - tasks: [queue.*]
     interval:
-      hours: 5
+      hours: 2
   - tasks: [movies.*, series.*, over.*]
     interval:
       minutes: 20
