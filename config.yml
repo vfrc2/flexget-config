@@ -69,7 +69,14 @@ templates:
     thetvdb_lookup: yes
   
   movies-global:
-    verify_ssl_certificates: no  
+    verify_ssl_certificates: no 
+    quality: <=720p
+    
+    content_size:
+      min: 12
+      max: 2000
+      strict: no
+
     movie_queue: accept
 #    transmission:
 #      path: /srv/share/downloads/movies
@@ -195,6 +202,8 @@ tasks:
       - content_size
       - torrent_alive
       - movie_queue
+      - quality
+      - content_size
 
     filesystem:
       path: '/home/vfrc2/' #movie folder
@@ -230,6 +239,9 @@ tasks:
       - content_size
       - torrent_alive
       - movie_queue
+      - quality
+      - content_size
+      
     accept_all: yes
     
   #Movies from global feed filtred by movie_queue
@@ -239,10 +251,8 @@ tasks:
     
     manipulate:
       - title:
-          replace:
-            regexp: '(.*?/\s*(.*?)|(.*?))\s(\[+.*\])'
-            format: '\2 \4'
-        
+          extract: '.+?\s+/(.*)'
+          
     template:
       - movies-global
       
