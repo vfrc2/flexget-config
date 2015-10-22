@@ -5,14 +5,24 @@
 # trakt.login
 # trakt.pass
 # lost.cookie
+# nnm.dl
 secrets: secrets.yml #paswords and account info
 
 templates:
-  global:
+  global:   
     transmission:
       host: server.f6.lan
       path: /srv/share/downloads
     
+    trakt_list:
+      username: "{{ secrets.trakt.login }}"
+      password: "{{ secrets.trakt.pass }}"
+    
+    # Require at least 10 seeds of any torrent
+    torrent_alive:
+      min_seeds: 10
+      reject_for: 1 day
+      
     regexp:
       reject:
         - (s|d)ub(s|bed)?\b: {from: title}                    # Block any subbed/dubbed/etc videos
@@ -32,11 +42,6 @@ templates:
         - \bASAP\b: {from: title}
         - the.day.of.the.doctor                               # The following are titles that caused me issues from plugins
     
-    # Require at least 10 seeds of any torrent
-    torrent_alive:
-      min_seeds: 10
-      reject_for: 1 day
-    
     # Filter by filenames. Allow multiple video types and rar packs (but note if there is just a
     # single .rar file it won't be accepted)
     content_filter:
@@ -53,18 +58,35 @@ templates:
     verify_ssl_certificates: no
     # Size and seed restrictions require real torrents
     magnets: no
-    
+  
+  #For item what i choose, disable all filters
+  acceptall-global:
+    disable:
+      - seen
+      - seen_info_hash
+      - retry_failed
+      - configure_series
+      - trakt_list
+      - inputs
+      - exists_series
+      - regexp
+      - content_size
+      - torrent_alive
+      - movie_queue
+      - quality
+      - content_size
+      
+    accept_all: yes
   
   tv-global:
     configure_series:
       from:
         trakt_list:
-          username: "{{ secrets.trakt.login }}"
-          password: "{{ secrets.trakt.pass }}"
           list: Follow
           type: shows
       settings:
         quality: <720p
+    
     transmission:
       path: /srv/share/downloads/series/{{ series_name }}
 
@@ -78,7 +100,6 @@ templates:
     
   
   movies-global:
-    verify_ssl_certificates: no 
     quality: <=720p
     
     content_size:
@@ -87,17 +108,17 @@ templates:
       strict: no
 
     movie_queue: accept
+    
     transmission:
       path: /srv/share/downloads/movies
     
     pushbullet:
       apikey: '{{ secrets.pushbullet.apikey }}'
       title: "[Flexget] {{task}}"
-      body: "{{ imdb_name }} ({{ imdb_year }})\n{{ quality }}"
+      body: "{% if imdb_name %}{{ imdb_name }} ({{ imdb_year }})\n{{ quality }}{% else %}{{ title }}{% end if %}"
       url: "{% if imdb_url %}{{ imdb_url }}{% endif %}"
 
   over-global:
-    verify_ssl_certificates: no
     transmission:
       path: /srv/share/downloads/
       
@@ -135,19 +156,10 @@ tasks:
   #not check for series ep num or so, just download torrent 
   local.series:
     priority: 10
+    
     template:
       - tv-global
-    disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
-      - configure_series
-      - trakt_list
-      - inputs
-      - exists_series
-      - regexp
-      - content_size
-      - torrent_alive
+      - acceptall-global #no need for filtring items
 
     find:
       path: '/home/vfrc2/'
@@ -163,11 +175,15 @@ tasks:
       on_output:
         for_accepted: rm "{{location}}"
     
-    accept_all: yes
+    
 
   #from lostfilm.tv main series feed
   series.lostfilm.tv:
     priority: 11
+    
+    template:
+      - tv-global
+    
     headers:
       cookie: '{{ secrets.lost.cookie }}'
     rss: http://www.lostfilm.tv/rssdd.xml
@@ -189,49 +205,28 @@ tasks:
         regexp: 'http://lostfilm.tv/download.php\?(?P<details>.*)'
         format: 'http://www.lostfilm.tv/download.php?\g<details>'
     
-    template:
-      - tv-global
+    
   
   #second series feed, emit only selected torrents, need just for grouping
   series.nnm-club.me.dl:
     priority: 10
-    rss: "http://nnm-club.me/forum/rss2.php?f=1219,768,769&r&dl={{ secrets.nnm-club.dl }}&h=24"
-    disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
-      - configure_series
-      - trakt_list
-      - inputs
-      - exists_series
-      - regexp
-      - content_size
-      - torrent_alive
-      
-    no_entries_ok: yes
-    accept_all: true
+    
     template:
-      - tv-global    
+      - tv-global
+      - acceptall-global #not need filtring
+    
+    rss: "http://nnm-club.me/forum/rss2.php?f=1219,768,769&r&dl={{ secrets.nnm.dl }}&h=24"
+          
+    no_entries_ok: yes
+    
     
   # local movie feed
   local.movies:
     priority: 20
+    
     template:
       - movies-global
-    disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
-      - configure_series
-      - trakt_list
-      - inputs
-      - exists_series
-      - regexp
-      - content_size
-      - torrent_alive
-      - movie_queue
-      - quality
-      - content_size
+      - acceptall-global
 
     filesystem:
       path: '/home/vfrc2/' #movie folder
@@ -246,62 +241,38 @@ tasks:
     exec:
       on_output:
         for_accepted: rm "{{location}}"
-
-    accept_all: yes
   
   #Movies accept without filter, just for groouping
   movies.nnm-club.me.dl:
     priority: 20
-    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&dl={{ secrets.nnm-club.dl }}&h=24"
+    
     template:
       - movies-global
-    disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
-      - configure_series
-      - trakt_list
-      - inputs
-      - exists_series
-      - regexp
-      - content_size
-      - torrent_alive
-      - movie_queue
-      - quality
-      - content_size
+      - acceptall-global
+    
+    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&dl={{ secrets.nnm.dl }}&h=24"
     
     no_entries_ok: yes
-    accept_all: yes
     
   #Movies from global feed filtred by movie_queue
   movies.nnm-club.me:
     priority: 21
+    
+    template:
+      - movies-global
+    
     rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&h=24"
     
     manipulate:
       - title:
           extract: '.+?\s+/(.*)'
-          
-    template:
-      - movies-global
       
       
   local.over:
     priority: 30
     template:
       - over-global
-    disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
-      - configure_series
-      - trakt_list
-      - inputs
-      - exists_series
-      - regexp
-      - content_size
-      - torrent_alive
-      - movie_queue
+      - acceptall-global
 
     filesystem:
       path: '/home/vfrc2/' #over folder
@@ -317,37 +288,29 @@ tasks:
       on_output:
         for_accepted: rm "{{location}}"
 
-    accept_all: yes
-
   over.nnm-club.me.dl:
     priority: 30
-    rss: "http://nnm-club.me/forum/rss2.php?dl={{ secrets.nnm-club.dl }}&h=24"
+    
     template:
       - over-global
-    disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
-      - configure_series
-      - trakt_list
-      - inputs
-      - exists_series
-      - regexp
-      - content_size
-      - torrent_alive
-      - movie_queue
-    accept_all: yes
+      - acceptall-global
+    
+    rss: "http://nnm-club.me/forum/rss2.php?dl={{ secrets.nnm.dl }}&h=24"
       
 #Service tasks
 
   #service task for fillup moviequeue
   queue.movies:
+    template:
+      - acceptall-global
+      
     trakt_list:
-      username: "{{ secrets.trakt.login }}"
-      password: "{{ secrets.trakt.pass }}"
       list: watchlist
       type: movies
-    accept_all: yes
+    
+    disable:
+      - transmission
+
     movie_queue: add
 
 schedules:
