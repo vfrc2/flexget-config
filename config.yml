@@ -89,7 +89,7 @@ templates:
         quality: <720p
     
     transmission:
-      path: '/srv/share/downloads/series/{series_name|default('')}'
+      path: '/srv/share/downloads/series/{{ series_name|default('') }}'
 
     thetvdb_lookup: yes
     
@@ -165,7 +165,7 @@ tasks:
     filesystem:
       path: '/home/vfrc2/Dropbox/torrents/tv'
       regexp: '.*\.torrent$'
-      recursive: yes
+      #recursive: yes
     
     manipulate:
       - title:
@@ -174,6 +174,8 @@ tasks:
             format: ' '
             
     no_entries_ok: yes
+    
+    all_series: yes
     
     plugin_priority:
       exec: 0
@@ -238,7 +240,7 @@ tasks:
     filesystem:
       path: '/home/vfrc2/Dropbox/torrents/movies' #movie folder
       regexp: '.*\.torrent$'
-      recursive: yes
+      #recursive: yes
 
     no_entries_ok: yes
     
@@ -290,7 +292,7 @@ tasks:
     filesystem:
       path: '/home/vfrc2/Dropbox/torrents' #over folder
       regexp: '.*\.torrent$'
-      recursive: yes
+      #recursive: yes
 
     no_entries_ok: yes
 
