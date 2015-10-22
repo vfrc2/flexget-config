@@ -164,7 +164,7 @@ tasks:
       - acceptall-global #no need for filtring items
 
     filesystem:
-      path: '/home/vfrc2/'
+      path: '/home/vfrc2/Dropbox/torrents/tv'
       regexp: '.*\.torrent$'
       recursive: yes
     
@@ -231,7 +231,7 @@ tasks:
       - acceptall-global
 
     filesystem:
-      path: '/home/vfrc2/' #movie folder
+      path: '/home/vfrc2/Dropbox/torrents/movies' #movie folder
       regexp: '.*\.torrent$'
       recursive: yes
 
@@ -277,7 +277,7 @@ tasks:
       - acceptall-global
 
     filesystem:
-      path: '/home/vfrc2/' #over folder
+      path: '/home/vfrc2/Dropbox/torrents' #over folder
       regexp: '.*\.torrent$'
       recursive: yes
 
