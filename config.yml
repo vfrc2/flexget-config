@@ -11,7 +11,6 @@
 # on new install copy secrets-pattern.yml to secrets.yml
 # and change values
 secrets: secrets.yml #paswords and account info
-
 templates:
   global:   
     transmission:
@@ -313,6 +312,7 @@ tasks:
       type: movies
       
     movie_queue: add
+    accept_all: true
 
 schedules:
   - tasks: [queue.*]
