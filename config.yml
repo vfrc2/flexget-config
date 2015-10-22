@@ -89,7 +89,7 @@ templates:
         quality: <720p
     
     transmission:
-      path: /srv/share/downloads/series/{{ series_name }}
+      path: '/srv/share/downloads/series/{series_name|default('')}'
 
     thetvdb_lookup: yes
     
@@ -167,6 +167,12 @@ tasks:
       regexp: '.*\.torrent$'
       recursive: yes
     
+    manipulate:
+      - title:
+          replace:
+            regexp: '\.'
+            format: ' '
+            
     no_entries_ok: yes
     
     plugin_priority:
@@ -235,6 +241,12 @@ tasks:
       recursive: yes
 
     no_entries_ok: yes
+    
+    manipulate:
+      - title:
+          replace:
+            regexp: '\.'
+            format: ' '
 
     plugin_priority:
       exec: 0
