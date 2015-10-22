@@ -6,6 +6,10 @@
 # trakt.pass
 # lost.cookie
 # nnm.dl
+# pushbullet.api
+
+# on new install copy secrets-pattern.yml to secrets.yml
+# and change values
 secrets: secrets.yml #paswords and account info
 
 templates:
@@ -13,11 +17,7 @@ templates:
     transmission:
       host: server.f6.lan
       path: /srv/share/downloads
-    
-    trakt_list:
-      username: "{{ secrets.trakt.login }}"
-      password: "{{ secrets.trakt.pass }}"
-    
+
     # Require at least 10 seeds of any torrent
     torrent_alive:
       min_seeds: 10
@@ -82,6 +82,8 @@ templates:
     configure_series:
       from:
         trakt_list:
+          username: "{{ secrets.trakt.login }}"
+          password: "{{ secrets.trakt.pass }}"
           list: Follow
           type: shows
       settings:
@@ -161,7 +163,7 @@ tasks:
       - tv-global
       - acceptall-global #no need for filtring items
 
-    find:
+    filesystem:
       path: '/home/vfrc2/'
       regexp: '.*\.torrent$'
       recursive: yes
@@ -305,6 +307,8 @@ tasks:
       - acceptall-global
       
     trakt_list:
+      username: "{{ secrets.trakt.login }}"
+      password: "{{ secrets.trakt.pass }}"
       list: watchlist
       type: movies
     
