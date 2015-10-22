@@ -82,8 +82,8 @@ templates:
     configure_series:
       from:
         trakt_list:
-          username: "{{ secrets.trakt.login }}"
-          password: "{{ secrets.trakt.pass }}"
+          username: '{{ secrets.trakt.login }}'
+          password: '{{ secrets.trakt.pass }}'
           list: Follow
           type: shows
       settings:
@@ -297,7 +297,7 @@ tasks:
       - over-global
       - acceptall-global
     
-    rss: "http://nnm-club.me/forum/rss2.php?dl={{ secrets.nnm.dl }}&h=24"
+    rss: 'http://nnm-club.me/forum/rss2.php?dl={{ secrets.nnm.dl }}&h=24'
       
 #Service tasks
 
@@ -307,8 +307,8 @@ tasks:
       - acceptall-global
       
     trakt_list:
-      username: "{{ secrets.trakt.login }}"
-      password: "{{ secrets.trakt.pass }}"
+      username: '{{ secrets.trakt.login }}'
+      password: '{{ secrets.trakt.pass }}'
       list: watchlist
       type: movies
     
