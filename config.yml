@@ -311,6 +311,7 @@ tasks:
       list: watchlist
       type: movies
       
+    seen: local  
     movie_queue: add
     accept_all: true
 
