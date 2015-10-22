@@ -303,7 +303,9 @@ tasks:
 
   #service task for fillup moviequeue
   queue.movies:
-
+    template: 
+      - no_global
+      
     trakt_list:
       username: '{{ secrets.trakt.login }}'
       password: '{{ secrets.trakt.pass }}'
@@ -311,12 +313,6 @@ tasks:
       type: movies
       
     movie_queue: add
-    
-    template:
-      - acceptall-global
-      
-    disable:
-      - transmission
 
 schedules:
   - tasks: [queue.*]
