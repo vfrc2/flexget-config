@@ -15,7 +15,9 @@ templates:
   global:   
     transmission:
       host: server.f6.lan
-      path: /srv/share/downloads
+
+    set:
+      path: {{ secrets.local.downloaddir }}
 
     # Require at least 10 seeds of any torrent
     torrent_alive:
@@ -88,15 +90,15 @@ templates:
       settings:
         quality: <720p
     
-    transmission:
-      path: '/srv/share/downloads/series/{{ series_name|default('') }}'
+    set:
+      path: "{{ secrets.local.downloaddir }}/series/{% if series_name is defined %}{{ tvdb_series_name|default(series_name) }}{% endif %}"
 
     thetvdb_lookup: yes
     
     pushbullet:
       apikey: '{{ secrets.pushbullet.apikey }}'
       title: "[Flexget] {{task}}"
-      body: "{{ tvdb_series_name|default(series_name) }} - {{ series_id }}{% if tvdb_ep_name|default(False) %} - {{ tvdb_ep_name }}{% endif %}\n{{ quality }}"
+      body: "{% if series_name is defined %}{{ tvdb_series_name|default(series_name) }} - {{ series_id }}{% if tvdb_ep_name|default(False) %} - {{ tvdb_ep_name }}{% endif %}\n{{ quality }}{% else %}{{ title }}{% endif %}"
       url: "{% if trakt_series_url is defined and trakt_season is defined and trakt_episode is defined %}{{ trakt_series_url }}/season/{{ trakt_season }}/episode/{{ trakt_episode }}{% endif %}"
     
   
@@ -110,18 +112,18 @@ templates:
 
     movie_queue: accept
     
-    transmission:
-      path: /srv/share/downloads/movies
+    set:
+      path: "{{ secrets.local.downloaddir }}/movies"
     
     pushbullet:
       apikey: '{{ secrets.pushbullet.apikey }}'
       title: "[Flexget] {{task}}"
-      body: "{% if imdb_name %}{{ imdb_name }} ({{ imdb_year }})\n{{ quality }}{% else %}{{ title }}{% end if %}"
+      body: "{% if imdb_name is define %}{{ imdb_name }} ({{ imdb_year }})\n{{ quality }}{% else %}{{ title }}{% end if %}"
       url: "{% if imdb_url %}{{ imdb_url }}{% endif %}"
 
   over-global:
-    transmission:
-      path: /srv/share/downloads/
+    set:
+      path: "{{ secrets.local.downloaddir }}"
       
     pushbullet:
       apikey: '{{ secrets.pushbullet.apikey }}'
@@ -163,7 +165,7 @@ tasks:
       - acceptall-global #no need for filtring items
 
     filesystem:
-      path: '/home/vfrc2/Dropbox/torrents/tv'
+      path: "{{ secrets.lookup.series }}"
       regexp: '.*\.torrent$'
       #recursive: yes
     
@@ -175,7 +177,8 @@ tasks:
             
     no_entries_ok: yes
     
-    all_series: yes
+    series:
+      parse_only: yes
     
     plugin_priority:
       exec: 0
@@ -188,10 +191,13 @@ tasks:
 
   #from lostfilm.tv main series feed
   series.lostfilm.tv:
-    priority: 11
+    priority: 10
     
     template:
       - tv-global
+
+    disable:
+      - torrent_alive
     
     headers:
       cookie: '{{ secrets.lost.cookie }}'
@@ -218,7 +224,7 @@ tasks:
   
   #second series feed, emit only selected torrents, need just for grouping
   series.nnm-club.me.dl:
-    priority: 10
+    priority: 11
     
     template:
       - tv-global
@@ -238,7 +244,7 @@ tasks:
       - acceptall-global
 
     filesystem:
-      path: '/home/vfrc2/Dropbox/torrents/movies' #movie folder
+      path: "{{ secrets.lookup.movies }}" #movie folder
       regexp: '.*\.torrent$'
       #recursive: yes
 
@@ -290,7 +296,7 @@ tasks:
       - acceptall-global
 
     filesystem:
-      path: '/home/vfrc2/Dropbox/torrents' #over folder
+      path: "{{ secrets.lookup.over }}" #over folder
       regexp: '.*\.torrent$'
       #recursive: yes
 
