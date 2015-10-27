@@ -17,7 +17,7 @@ templates:
       host: server.f6.lan
 
     set:
-      path: {{ secrets.local.downloaddir }}
+      path: "{{ secrets.local.downloaddir }}"
 
     # Require at least 10 seeds of any torrent
     torrent_alive:
@@ -63,9 +63,9 @@ templates:
   #For item what i choose, disable all filters
   acceptall-global:
     disable:
-      - seen
-      - seen_info_hash
-      - retry_failed
+      #- seen
+      #- seen_info_hash
+      #- retry_failed
       - configure_series
       - trakt_list
       - inputs
@@ -80,6 +80,9 @@ templates:
     accept_all: yes
   
   tv-global:
+    set:
+      path: "{{ secrets.local.downloaddir }}/series/"
+          
     configure_series:
       from:
         trakt_list:
@@ -89,9 +92,8 @@ templates:
           type: shows
       settings:
         quality: <720p
-    
-    set:
-      path: "{{ secrets.local.downloaddir }}/series/{% if series_name is defined %}{{ tvdb_series_name|default(series_name) }}{% endif %}"
+        set:
+          path: "{{ secrets.local.downloaddir }}/series/{% if series_name is defined %}{{ tvdb_series_name|default(series_name) }}{% endif %}"
 
     thetvdb_lookup: yes
     
@@ -177,8 +179,10 @@ tasks:
             
     no_entries_ok: yes
     
-    series:
+    all_series:
       parse_only: yes
+      set:
+        path: "{{ secrets.local.downloaddir }}/series/{% if series_name is defined %}{{ tvdb_series_name|default(series_name) }}{% endif %}"
     
     plugin_priority:
       exec: 0
