@@ -237,7 +237,7 @@ tasks:
       - tv-global
       - acceptall-global #not need filtring
     
-    rss: "http://nnm-club.me/forum/rss2.php?f=1219,768,769&r&dl={{ secrets.nnm.dl }}&uk={{ secret.nnm.uk }}&h=24"
+    rss: "http://nnm-club.me/forum/rss2.php?f=1219,768,769&r&dl={{ secrets.nnm.dl }}&uk={{ secrets.nnm.uk }}&h=24"
           
     no_entries_ok: yes
     
@@ -278,7 +278,7 @@ tasks:
       - movies-global
       - acceptall-global
     
-    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&dl={{ secrets.nnm.dl }}&uk={{ secret.nnm.uk }}&h=24"
+    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&dl={{ secrets.nnm.dl }}&uk={{ secrets.nnm.uk }}&h=24"
     
     no_entries_ok: yes
     
@@ -289,7 +289,7 @@ tasks:
     template:
       - movies-global
     
-    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&uk={{ secret.nnm.uk }}&h=24"
+    rss: "http://nnm-club.me/forum/rss2.php?f=216,318,220,224&r&uk={{ secrets.nnm.uk }}&h=24"
     
     manipulate:
       - title:
@@ -323,7 +323,7 @@ tasks:
       - over-global
       - acceptall-global
     
-    rss: 'http://nnm-club.me/forum/rss2.php?dl={{ secrets.nnm.dl }}&uk={{ secret.nnm.uk }}&h=24'
+    rss: 'http://nnm-club.me/forum/rss2.php?dl={{ secrets.nnm.dl }}&uk={{ secrets.nnm.uk }}&h=24'
       
 #Service tasks
 
