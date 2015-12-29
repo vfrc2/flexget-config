@@ -90,7 +90,6 @@ templates:
       from:
         trakt_list:
           username: '{{ secrets.trakt.login }}'
-          password: '{{ secrets.trakt.pass }}'
           list: Follow
           type: shows
       settings:
@@ -334,7 +333,6 @@ tasks:
       
     trakt_list:
       username: '{{ secrets.trakt.login }}'
-      password: '{{ secrets.trakt.pass }}'
       list: watchlist
       type: movies
       
