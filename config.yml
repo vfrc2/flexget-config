@@ -89,7 +89,7 @@ templates:
     configure_series:
       from:
         trakt_list:
-          username: '{{ secrets.trakt.login }}'
+          account: '{{ secrets.trakt.login }}'
           list: Follow
           type: shows
       settings:
@@ -332,7 +332,7 @@ tasks:
       - no_global
       
     trakt_list:
-      username: '{{ secrets.trakt.login }}'
+      account: '{{ secrets.trakt.login }}'
       list: watchlist
       type: movies
       
