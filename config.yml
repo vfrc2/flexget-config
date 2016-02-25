@@ -322,6 +322,8 @@ tasks:
       - over-global
       - acceptall-global
     
+    no_entries_ok: yes
+    
     rss: 'http://nnm-club.me/forum/rss2.php?dl={{ secrets.nnm.dl }}&uk={{ secrets.nnm.uk }}&h=24'
       
 #Service tasks
