@@ -182,7 +182,7 @@ tasks:
     no_entries_ok: yes
     
     all_series:
-      parse_only: yes
+      #parse_only: yes
       set:
         path: "{{ secrets.local.downloaddir }}/series/{{ tvdb_series_name|default(series_name) }}"
     
@@ -235,6 +235,8 @@ tasks:
     template:
       - tv-global
       - acceptall-global #not need filtring
+      
+    all_series: yes
     
     rss: "http://nnm-club.me/forum/rss2.php?f=1219,768,769&r&dl={{ secrets.nnm.dl }}&uk={{ secrets.nnm.uk }}&h=24"
           
