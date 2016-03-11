@@ -68,7 +68,7 @@ templates:
       #- seen
       #- seen_info_hash
       #- retry_failed
-      - configure_series
+      #- configure_series
       - trakt_list
       - inputs
       - exists_series
