@@ -353,7 +353,6 @@ tasks:
       account: '{{ secrets.trakt.login }}'
       context: collected
       list: watched
-      strip_dates: yes
       position: next
     accept_all: yes
     set_series_begin: yes
