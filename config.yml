@@ -343,6 +343,20 @@ tasks:
     seen: local  
     movie_queue: add
     accept_all: true
+    
+  queue.series:
+    template: 
+      - no_global
+      
+    manual: yes 
+    trakt_emit:
+      account: '{{ secrets.trakt.login }}'
+      context: collected
+      list: watched
+      strip_dates: yes
+      position: next
+    accept_all: yes
+    set_series_begin: yes
 
 schedules:
   - tasks: [queue.*]
